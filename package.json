@@ -1,0 +1,31 @@
+{
+  "name": "kiwiflow",
+  "version": "1.0.0",
+  "description": "KiwiFlow Shiny App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-packager . --platform=win32 --arch=x64 --out=dist --overwrite"
+  },
+  "out": "KiwiFlow",
+  "icon": "app/static/favicon.ico",
+  "app": {
+    "CompanyName": "Liora Bioinformatics",
+    "FileDescription": "KiwiFlow Shiny App",
+    "ProductName": "KiwiFlow"
+  },
+  "dependencies": {
+    "await-to-js": "^3.0.0",
+    "config": "^3.3.12",
+    "electron": "^26.2.4",
+    "js-yaml": "^4.1.0",
+    "yaml": "^2.7.1"
+  },
+  "devDependencies": {
+    "electron": "^26.6.10"
+  },
+  "extraFiles": [
+    "app/**",
+    "config/**"
+  ]
+}

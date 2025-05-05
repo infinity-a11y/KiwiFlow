@@ -63,7 +63,7 @@ ui <- function(id) {
         )
       ),
       window_title = "KiwiFlow 0.1.0",
-      underline = TRUE,
+      navbar_options = bslib$navbar_options(underline = TRUE),
       bslib$nav_panel(
         title = "Deconvolution",
         bslib$page_sidebar(
@@ -154,6 +154,7 @@ server <- function(id) {
     # Kill server on session end
     session$onSessionEnded(function() {
       write_log("Session closed")
+      quit(save = "no")
       shiny$stopApp()
     })
     

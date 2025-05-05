@@ -1,0 +1,38 @@
+config:
+  width: 1280
+  height: 720
+  title: KiwiFlow 1.0.0
+  quitOnClose: true
+R:
+  url: "http://127.0.0.1"
+  port: 3838
+  kill: false
+  app: "app.R"  # Point directly to app.R instead of "resources/app"
+  path:
+    portable: "../app/R-Portable-Win/bin/Rscript.exe"  # Goes up one level to dist/KiwiFlow-win32-x64
+    local: "C:/Program Files/R/R-4.4.2/bin/Rscript.exe"
+    home: "../app/R-Portable-Win"
+  fixHome: true
+  isPortable: true
+window:
+  delay: 2000
+  poll: 1000
+  loading:
+    path: "loading.html"
+    isURL: false
+    config:
+      show: false
+      width: 1200
+      height: 1000
+      title: KiwiFlow Loading
+  config:
+    show: false
+    width: 1280
+    height: 720
+    title: KiwiFlow
+    webPreferences:
+      nodeIntegration: false
+  dev: false
+  fullReload: true
+app:
+  quitOnClose: true

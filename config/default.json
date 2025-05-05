@@ -1,0 +1,30 @@
+{
+  "R": {
+    "app": "app",
+    "port": 3838,
+    "isPortable": true,
+    "path": {
+      "portable": "R-Portable-Win/bin/Rscript.exe",
+      "local": "C:/path/to/local/R/Rscript.exe",
+      "home": "R-Portable-Win"
+    },
+    "fixHome": true,
+    "kill": true,
+    "url": "http://127.0.0.1"
+  },
+  "window": {
+    "config": { "width": 800, "height": 600 },
+    "loading": {
+      "config": { "width": 400, "height": 300 },
+      "path": "loading.html",
+      "isURL": false
+    },
+    "dev": true,
+    "delay": 1000,
+    "poll": 500,
+    "fullReload": true
+  },
+  "app": {
+    "quitOnClose": true
+  }
+}
