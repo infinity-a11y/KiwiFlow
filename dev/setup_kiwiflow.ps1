@@ -59,7 +59,7 @@ Start-Transcript -Path "$userDataPath\kiwiflow_setup.log"
 Write-Host "Setting up KiwiFlow environment in $basePath..."
 
 # Verify critical files exist
-$criticalFiles = @("resources\environment.yml", "app.R")
+$criticalFiles = @("resources\environment_base.yml", "app.R")
 foreach ($file in $criticalFiles) {
     if (-not (Test-Path "$basePath\$file")) {
         Write-Host "Error: Required file '$file' not found in $basePath."
@@ -140,9 +140,10 @@ try {
 Set-Location $basePath
 
 # Check and manage kiwiflow environment
-Write-Host "Checking kiwiflow environment in $basePath\resources\environment.yml"
+# First the base environment
+Write-Host "Checking kiwiflow base environment in $basePath\resources\environment_base.yml"
 try {
-    $envYmlPath = "$basePath\resources\environment.yml"
+    $envYmlPath = "$basePath\resources\environment_base.yml"
     # Use conda run to execute commands in the base environment
     $envExists = & $condaPath run -n base conda env list | Select-String "kiwiflow"
     if ($envExists) {
@@ -156,6 +157,29 @@ try {
         if ($LASTEXITCODE -ne 0) { throw "Conda environment creation failed with exit code $LASTEXITCODE." }
         Write-Host "Environment created successfully."
     }
+} catch {
+    $errorMsg = "Error: Failed to manage environment. $_`nRun 'conda env create -n kiwiflow -f $envYmlPath' or 'conda env update -n kiwiflow -f $envYmlPath --prune' manually to debug."
+    Write-Host $errorMsg
+    $wShell.Popup($errorMsg, 0, "KiwiFlow Setup Error", 16)
+    Stop-Transcript
+    exit 1
+}
+
+# Safely install Rcpp from source
+Write-Host "Installing Rcpp"
+try {
+    & $condaPath run -n kiwiflow Rscript.exe --vanilla -e "install.packages('Rcpp', repos = 'https://cloud.r-project.org')"
+} catch {
+    Write-Host "Installation of Rcpp failed. Trying to install R packages anyway."
+}
+
+# Second environment containing R packages
+Write-Host "Complementing with R package environment in $basePath\resources\environment_pkgs.yml"
+try {
+    $envYmlPath = "$basePath\resources\environment_rpkgs.yml"
+    & $condaPath run -n base conda env update -n kiwiflow -f $envYmlPath --prune
+    if ($LASTEXITCODE -ne 0) { throw "Conda environment update failed with exit code $LASTEXITCODE." }
+    Write-Host "Environment updated successfully."
 } catch {
     $errorMsg = "Error: Failed to manage environment. $_`nRun 'conda env create -n kiwiflow -f $envYmlPath' or 'conda env update -n kiwiflow -f $envYmlPath --prune' manually to debug."
     Write-Host $errorMsg

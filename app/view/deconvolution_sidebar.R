@@ -107,16 +107,27 @@ server <- function(id) {
     selected <- shiny::reactiveVal("")
 
     # Define roots for directory browsing
-    roots <- c(Home = path_home(), C = "C:/", D = "D:/")
+    #roots <- c(Home = path_home(), C = "C:/", D = "D:/")
+      roots <- c("My Images" = "/app_data",
+             "Container Home" = "~", # The container's user home directory
+             "Container Root" = "/") # The root of the container's filesystem
 
     # Initialize root folder selection
+    # shinyDirChoose(
+    #   input,
+    #   id = "folder",
+    #   roots = roots,
+    #   defaultRoot = "Home",
+    #   session = session
+    # )
+
     shinyDirChoose(
-      input,
-      id = "folder",
-      roots = roots,
-      defaultRoot = "Home",
-      session = session
-    )
+    input,
+    id = "file",
+    roots = roots,
+    defaultRoot = "My Images", # This should match one of the names in your 'roots'
+    session = session
+  )
 
     # Initialize individual file selection
     shinyDirChoose(

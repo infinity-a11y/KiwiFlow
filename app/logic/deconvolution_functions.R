@@ -161,12 +161,12 @@ deconvolute <- function(
     on.exit(parallel::stopCluster(cl))
     
     # Initialize workers
-    parallel::clusterEvalQ(cl, {
-      tryCatch({
-        reticulate::use_condaenv("kiwiflow", required = TRUE)
-        TRUE
-      }, error = function(e) FALSE)
-    })
+    #parallel::clusterEvalQ(cl, {
+    #  tryCatch({
+    #    reticulate::use_condaenv("kiwiflow", required = TRUE)
+    #    TRUE
+    #  }, error = function(e) FALSE)
+    #})
     
     # Export only what's needed
     parallel::clusterExport(cl, c("process_single_dir"), envir = environment())
@@ -188,7 +188,7 @@ deconvolute <- function(
       })
     })
   } else {
-    use_condaenv("kiwiflow", required = TRUE)
+    #use_condaenv("kiwiflow", required = TRUE)
     
     message("Sequential processing started.")
     tryCatch({

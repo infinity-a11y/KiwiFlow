@@ -1379,7 +1379,7 @@ server <- function(id, dirs) {
       write("", reactVars$decon_process_out)
 
       rx_process <- process$new(
-        "Rscript.exe",
+        "Rscript",
         args = c(
           "app/logic/deconvolution_execute.R",
           temp,

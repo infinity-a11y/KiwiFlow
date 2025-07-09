@@ -1,0 +1,45 @@
+name: hot_chili
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python
+  - pip
+  - r-base
+  - r-renv
+  - r-data.table
+  - r-DT
+  - r-ggplot2
+  - r-gridextra
+  - r-kableExtra
+  - r-knitr
+  - r-logr
+  - r-minpack.lm
+  - r-plotly
+  - r-plyr
+  - r-processx
+  - r-promises
+  - r-quarto
+  - r-readxl
+  - r-reticulate
+  - r-rhino
+  - r-rmarkdown
+  - r-shiny
+  - r-shinyalert
+  - r-shinydashboard
+  - r-shinyFiles
+  - r-shinyjs
+  - r-shinyWidgets
+  - r-stringr
+  - r-waiter
+  - numpy
+  - scipy
+  - matplotlib
+  - pandas
+  - plotly
+  - wxpython
+  - numba
+  - llvmlite
+  - r-devtools
+  - r-cpp11
+  - m2-make

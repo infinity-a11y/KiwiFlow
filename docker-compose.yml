@@ -1,0 +1,14 @@
+
+version: '3.8'
+
+services:
+  kiwiflow-shiny:
+    build: .
+    volumes:
+      - .:/app
+      - C:/Users:/home
+    environment:
+      - RETICULATE_PYTHON=/usr/bin/python3
+      - PYTHONPATH=/usr/local/lib/python3.11/site-packages
+    restart: unless-stopped
+    container_name: kiwiflow-app
