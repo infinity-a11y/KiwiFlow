@@ -3380,6 +3380,7 @@ render_table_view <- function(table, colors, tab, inputs, units) {
     if (length(unique(tbl[[group_variable]])) != nrow(tbl)) {
       if (all(tbl$`Sample ID` %in% names(colors))) {
         names(colors) <- paste("Sample ID:", names(colors))
+        tbl$col_var <- paste("Sample ID:", tbl$`Sample ID`)
       }
 
       tbl$`Sample ID` <- paste("Sample ID:", tbl$`Sample ID`)
@@ -3389,6 +3390,7 @@ render_table_view <- function(table, colors, tab, inputs, units) {
     if (length(unique(tbl[[group_variable]])) != nrow(tbl)) {
       if (all(tbl$`Cmp Name` %in% names(colors))) {
         names(colors) <- paste("Compound:", names(colors))
+        tbl$col_var <- paste("Compound:", tbl$`Cmp Name`)
       }
 
       tbl$`Cmp Name` <- paste("Compound:", tbl$`Cmp Name`)
@@ -3407,30 +3409,31 @@ render_table_view <- function(table, colors, tab, inputs, units) {
   }
 
   # Add color adaptive font color to table
-  tbl <- dplyr::mutate(
-    tbl,
-    dplyr::across(
-      -dplyr::any_of(c(
-        group_variable,
-        "col_var",
-        if (is.null(inputs$binding_bar) || isTRUE(inputs$binding_bar)) {
-          "%-Binding"
-        },
-        if (is.null(inputs$tot_binding_bar) || isTRUE(inputs$tot_binding_bar)) {
-          "Total %"
-        }
-      )),
-      ~ paste0(
-        "<span style='color:",
-        label_color,
-        "'>",
-        .x,
-        "</span>"
-      )
-    )
-  )
+  # tbl <- dplyr::mutate(
+  #   tbl,
+  #   dplyr::across(
+  #     -dplyr::any_of(c(
+  #       group_variable,
+  # "label_color",
+  #       "col_var",
+  #       if (is.null(inputs$binding_bar) || isTRUE(inputs$binding_bar)) {
+  #         "%-Binding"
+  #       },
+  #       if (is.null(inputs$tot_binding_bar) || isTRUE(inputs$tot_binding_bar)) {
+  #         "Total %"
+  #       }
+  #     )),
+  #     ~ paste0(
+  #       "<span style='color:",
+  #       label_color,
+  #       "'>",
+  #       .x,
+  #       "</span>"
+  #     )
+  #   )
+  # )
 
-  DT::datatable(
+  datatable <- DT::datatable(
     data = tbl,
     escape = FALSE,
     extensions = "RowGroup",
@@ -3481,26 +3484,31 @@ render_table_view <- function(table, colors, tab, inputs, units) {
       columns = "col_var",
       target = 'row',
       backgroundColor = DT::styleEqual(
-        levels = if (
-          length(units) == 2 && inputs$color_variable == units["Concentration"]
-        ) {
-          names(colors)
-        } else {
-          names(colors)
-        },
+        #   if (
+        #   length(units) == 2 && inputs$color_variable == units["Concentration"]
+        # ) {
+        #   names(colors)
+        # } else {
+        #   names(colors)
+        # },
+        levels = names(colors),
         values = colors
       ),
       color = DT::styleEqual(
-        levels = if (
-          length(units) == 2 && inputs$color_variable == units["Concentration"]
-        ) {
-          names(colors)
-        } else {
-          names(colors)
-        },
+        #   if (
+        #   length(units) == 2 && inputs$color_variable == units["Concentration"]
+        # ) {
+        #   names(colors)
+        # } else {
+        #   names(colors)
+        # },
+        levels = names(colors),
         values = get_contrast_color(colors)
       )
     )
+
+  aha <<- datatable
+  datatable
 }
 
 # Rendering function of hits table
