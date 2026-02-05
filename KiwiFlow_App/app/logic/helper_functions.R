@@ -36,7 +36,16 @@ safe_observe <- function(
       if (nchar(err_msg) > 0) err_msg else "No message provided by R"
     )
 
+    # Unblock mouse pointer
+    shinyjs::runjs(paste0(
+      'document.getElementById("blocking-overlay").style.display ',
+      '= "none";'
+    ))
+
+    # Remove existing modal window
     shiny::removeModal()
+
+    # Show error dialogue
     shiny::showModal(shiny::modalDialog(
       title = shiny::span(
         "⚠️ System Error",
