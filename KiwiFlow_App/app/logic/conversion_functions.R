@@ -2757,6 +2757,17 @@ multiple_spectra <- function(
   hits_summary = NULL,
   units = NULL
 ) {
+  results_list <<- results_list
+  samples <<- samples
+  cubic <<- cubic
+  labels_show <<- labels_show
+  time1 <<- time
+  color_cmp <<- color_cmp
+  truncated <<- truncated
+  color_variable <<- color_variable
+  hits_summary <<- hits_summary
+  units1 <<- units
+
   # Omit NA in samples
   samples <- samples[!is.na(samples)]
 
@@ -3026,6 +3037,42 @@ multiple_spectra <- function(
         )
     }
 
+    # Determine camera settings
+    if (length(unique(peaks_data$z)) < 4) {
+      camera <- list(
+        center = list(
+          x = 0.40,
+          y = 0.06,
+          z = 0.05
+        ),
+        eye = list(x = 1.17, y = 0.64, z = 1.26),
+        # eye = list(
+        #   x = 1 +
+        #     length(unique(peaks_data$z)) / 20 +
+        #     ifelse(labels_show, 0.2, 0),
+        #   y = 0.7 +
+        #     length(unique(peaks_data$z)) / 20 +
+        #     ifelse(labels_show, 0.2, 0),
+        #   z = 1 +
+        #     length(unique(peaks_data$z)) / 20 +
+        #     ifelse(labels_show, 0.2, 0)
+        # ),
+        up = list(x = -0.27, y = 0.93, z = -0.27)
+      )
+    } else if (length(unique(peaks_data$z)) < 8) {
+      camera <- list(
+        center = list(x = 0.31, y = -0.05, z = 0.13),
+        eye = list(x = 0.90, y = 0.75, z = 1.70),
+        up = list(x = -0.22, y = 0.90, z = -0.36)
+      )
+    } else {
+      camera <- list(
+        center = list(x = 0.40, y = -0.05, z = 0.05),
+        eye = list(x = 1.13, y = 0.74, z = 1.58),
+        up = list(x = -0.28, y = 0.9, z = -0.33)
+      )
+    }
+
     plot |>
       plotly::layout(
         paper_bgcolor = "rgba(0,0,0,0)",
@@ -3100,25 +3147,7 @@ multiple_spectra <- function(
             type = 'category',
             tickvals = levels(spectrum_data$z)
           ),
-          camera = list(
-            center = list(x = 0.33, y = -0.05, z = 0.05),
-            eye = if (length(unique(peaks_data$z)) <= 8) {
-              list(
-                x = 1 +
-                  length(unique(peaks_data$z)) / 20 +
-                  ifelse(labels_show, 0.2, 0),
-                y = 0.7 +
-                  length(unique(peaks_data$z)) / 20 +
-                  ifelse(labels_show, 0.2, 0),
-                z = 1 +
-                  length(unique(peaks_data$z)) / 20 +
-                  ifelse(labels_show, 0.2, 0)
-              )
-            } else {
-              list(x = 1.13, y = 0.74, z = 1.58)
-            },
-            up = list(x = -0.28, y = 0.9, z = -0.33)
-          )
+          camera = camera
         )
       )
   } else {
@@ -3160,13 +3189,11 @@ multiple_spectra <- function(
       plotly::add_markers(
         data = dplyr::mutate(
           peaks_data,
-          # color = paste0(color, "50"),
           symbol = paste0(symbol, "-open")
         ),
         x = ~mass,
         y = ~intensity,
         split = ~ interaction(z, color),
-        # split = ~z, # Splitting by time
         legendgroup = ~z,
         mode = "markers",
         color = marker_color,
@@ -3176,18 +3203,7 @@ multiple_spectra <- function(
           size = 10,
           zindex = 100,
           color = "white"
-          # ,
-          # line = list(color = "white", width = 2)
         ),
-        # marker = list(
-        #   # color = marker_color,
-        #   color = "white",
-        #   symbol = ~ I(symbol),
-        #   size = 10,
-        #   zindex = 100,
-        #   # line = list(color = ~ I(linecolor), width = 1)
-        #   line = list(color = "white", width = 1)
-        # ),
         hoverinfo = "text",
         text = ~ paste0(
           "Name: ",
@@ -3248,12 +3264,6 @@ multiple_spectra <- function(
 # Rendering function for relative binding table view
 #' @export
 render_table_view <- function(table, colors, tab, inputs, units) {
-  table1 <<- table
-  colors1 <<- colors
-  tab1 <<- tab
-  inputs1 <<- inputs
-  units1 <<- units
-
   # If table empty
   if (!nrow(table)) {
     return(DT::datatable(

@@ -1239,9 +1239,6 @@ server <- function(id, conversion_sidebar_vars, deconvolution_main_vars) {
       handler_fn = function() {
         shiny::req(deconvolution_main_vars$continue_conversion())
 
-        message(TRUE)
-        input_samples_table <<- input$samples_table
-
         # If present sample table ask confirmation
         if (!is.null(input$samples_table)) {
           # Switch to samples table tab
@@ -1401,8 +1398,6 @@ server <- function(id, conversion_sidebar_vars, deconvolution_main_vars) {
           '= "block";'
         ))
 
-        message("RESULTS OBSERVER")
-
         result_list <- conversion_sidebar_vars$result_list()
 
         analysis_select <- conversion_sidebar_vars$analysis_select()
@@ -1463,8 +1458,6 @@ server <- function(id, conversion_sidebar_vars, deconvolution_main_vars) {
           )]
           conversion_vars$hits_summary <- hits_summary
         }
-
-        result_list11 <<- result_list
 
         if (is.null(result_list)) {
           ### Reset conversion declaration interface ----
