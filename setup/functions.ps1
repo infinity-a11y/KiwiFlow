@@ -1,69 +1,71 @@
-#-----------------------------#
-# FUNCTION Find Conda
-#-----------------------------#
+#-----------------------------------------#
+# FUNCTION: Find-CondaExecutable
+#-----------------------------------------#
 function Find-CondaExecutable {
-    $searchPaths = @(
-        # Miniconda - System Wide
-        "$env:ProgramData\miniconda3\Scripts\conda.exe",
-        "$env:ProgramData\miniconda3\Library\bin\conda.exe",
-        "$env:ProgramData\miniconda3\condabin\conda.bat",
+    Write-Host "Searching for Miniforge-specific installation..." -ForegroundColor Gray
 
-        # Miniconda - User Specific
-        "$env:LOCALAPPDATA\miniconda3\Scripts\conda.exe",
-        "$env:LOCALAPPDATA\miniconda3\Library\bin\conda.exe",
-        "$env:LOCALAPPDATA\miniconda3\condabin\conda.bat"
+    # 1. Search specific Miniforge directories first
+    $searchPaths = @(
+        # System Wide
+        "$env:ProgramData\miniforge3\Scripts\conda.exe",
+        "$env:ProgramData\miniforge3\condabin\conda.bat",
+
+        # User Specific
+        "$env:LOCALAPPDATA\miniforge3\Scripts\conda.exe",
+        "$env:LOCALAPPDATA\miniforge3\condabin\conda.bat"
     )
 
-    # Search through hardcoded common paths
     foreach ($path in $searchPaths) {
         if (Test-Path $path) {
-            Write-Host "Found conda at: $path" -ForegroundColor Cyan
+            Write-Host "Verified Miniforge found at: $path" -ForegroundColor Cyan
             return $path
         }
     }
 
-    # Check if conda.exe is in the system PATH
+    # 2. Check system PATH, but VALIDATE it is Miniforge
     $condaInPath = Get-Command conda.exe, conda.bat -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($condaInPath) {
-        Write-Host "Found conda in system PATH: $($condaInPath.Path)" -ForegroundColor Cyan
-        return $condaInPath.Path
-    }
-
-    # Check Environment Variables
-    if ($env:CONDA_EXE -and (Test-Path $env:CONDA_EXE)) {
-        Write-Host "Found conda via CONDA_EXE: $env:CONDA_EXE" -ForegroundColor Cyan
-        return $env:CONDA_EXE
-    }
-
-    Write-Host "ERROR: conda.exe not found." -ForegroundColor Red
-    return $null
-}
-
-#-----------------------------#
-# FUNCTION Get-CondaScope
-#-----------------------------#
-function Get-CondaScope {
-    param([string]$CondaPath)
-
-    if (-not $CondaPath) { return $null }
-
-    # Define common system-level roots
-    $systemRoots = @(
-        $env:ProgramData,
-        $env:ProgramFiles,
-        "${env:ProgramFiles(x86)}"
-    )
-
-    foreach ($root in $systemRoots) {
-        if ($CondaPath.StartsWith($root, "OrdinalIgnoreCase")) {
-            return "allusers"
+        # Check if "miniforge" exists in the absolute path string
+        if ($condaInPath.Path -ilike "*miniforge*") {
+            Write-Host "Found Miniforge in system PATH: $($condaInPath.Path)" -ForegroundColor Cyan
+            return $condaInPath.Path
+        }
+        else {
+            Write-Host "Found Conda in PATH ($($condaInPath.Path)), but it is NOT Miniforge. Ignoring..." -ForegroundColor Yellow
         }
     }
 
-    if ($CondaPath -like "*\Users\*" -or $CondaPath.StartsWith($env:LOCALAPPDATA, "OrdinalIgnoreCase")) {
-        return "currentuser"
+    # 3. Check CONDA_EXE Environment Variable, but VALIDATE
+    if ($env:CONDA_EXE -and (Test-Path $env:CONDA_EXE)) {
+        if ($env:CONDA_EXE -ilike "*miniforge*") {
+            Write-Host "Found Miniforge via CONDA_EXE: $env:CONDA_EXE" -ForegroundColor Cyan
+            return $env:CONDA_EXE
+        }
     }
 
+    Write-Host "NOTICE: Miniforge-specific conda not found." -ForegroundColor Red
+    return $null
+}
+
+#-----------------------------------------#
+# FUNCTION: Get-CondaScope
+#-----------------------------------------#
+function Get-CondaScope {
+    param([string]$CondaPath)
+    if (-not $CondaPath) { return $null }
+
+    # Use .Contains() with OrdinalIgnoreCase for robust path matching
+    $isSystem = $false
+    
+    $systemRoots = @($env:ProgramData, $env:ProgramFiles, ${env:ProgramFiles(x86)})
+    foreach ($root in $systemRoots) {
+        if ($CondaPath.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) {
+            $isSystem = $true
+            break
+        }
+    }
+
+    if ($isSystem) { return "allusers" }
     return "currentuser"
 }
 
@@ -204,7 +206,8 @@ function Find-QuartoInstallation {
                 Version = $versionString.Trim()
             }
         }
-    } catch {
+    }
+    catch {
         Write-Host "Error: Quarto executable not found. $_"
         Stop-Transcript
         exit 1
